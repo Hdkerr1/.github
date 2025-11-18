@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-# whispered desire - simple anonymous whisper Telegram bot
+# Kali Das AI - anonymous whisper Telegram bot (previously "whispered desire")
 
 """
-whispered desire - simple anonymous whisper Telegram bot
+Kali Das AI - anonymous whisper Telegram bot
 
 Usage:
 - Set TELEGRAM_BOT_TOKEN in environment before running.
-- Optional: DB_PATH (default: whispers.db) and BOT_SALT (default: random constant).
+- Optional: DB_PATH (default: /data/whispers.db) and BOT_SALT (default: change this).
+- Optional: BOT_NAME (default: "kali das ai")
 """
 import os
 import sqlite3
@@ -19,11 +20,12 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 # Basic logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("whispered-desire")
+logger = logging.getLogger("kali-das-ai")
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-DB_PATH = os.environ.get("DB_PATH", "whispers.db")
-BOT_SALT = os.environ.get("BOT_SALT", "whispered-desire-default-salt")
+DB_PATH = os.environ.get("DB_PATH", "/data/whispers.db")
+BOT_SALT = os.environ.get("BOT_SALT", "kali-das-ai-default-salt")
+BOT_NAME = os.environ.get("BOT_NAME", "kali das ai")
 
 def ensure_db(path: str):
     conn = sqlite3.connect(path)
@@ -69,20 +71,18 @@ def get_last_for_user(path: str, user_hash: str):
     conn.close()
     return row
 
-
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Welcome to whispered desire.\n\n"
+        f"Welcome to {BOT_NAME}.
+\n"
         "Commands:\n"
         "/whisper <text> - send an anonymous whisper\n"
         "/mylast - show your last whisper (uses a non-reversible hash so you can retrieve your own whisper)\n"
         "/help - show this message"
     )
 
-
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start_command(update, context)
-
 
 async def whisper_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Accept text following command
@@ -105,7 +105,6 @@ async def whisper_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Use /mylast to retrieve your most recent whisper."
     )
 
-
 async def mylast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if not user:
@@ -121,7 +120,6 @@ async def mylast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Your last whisper (id #{whisper_id}, saved {created_at}):\n\n{content}"
     )
 
-
 def main():
     if not TELEGRAM_TOKEN:
         logger.error("TELEGRAM_BOT_TOKEN environment variable is not set. Exiting.")
@@ -136,9 +134,8 @@ def main():
     app.add_handler(CommandHandler("whisper", whisper_command))
     app.add_handler(CommandHandler("mylast", mylast_command))
 
-    logger.info("Starting whispered desire bot...")
+    logger.info(f"Starting {BOT_NAME} bot...")
     app.run_polling()
-
 
 if __name__ == "__main__":
     main()
