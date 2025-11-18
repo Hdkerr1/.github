@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  kali-das-ai:
+    build: .
+    container_name: kali-das-ai
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
